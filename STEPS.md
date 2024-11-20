@@ -27,4 +27,14 @@ Enter target version of Java (min. 7) (default: 21): 17
 Generate build using new APIs and behavior (some features may change in the next minor release)? (default: no) [yes, no]
 
 #### 3. call
+```
 ./gradlew clean build
+```
+
+#### 4. call
+```
+./gradlew clean build
+./gradlew bootRun
+./gradlew :app:bootRun
+```
+
