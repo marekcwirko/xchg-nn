@@ -28,3 +28,11 @@ replay_pid*
 
 # Ignore Gradle build output directory
 build
+
+# IntelliJ IDEA specific files to ignore
+.idea/workspace.xml
+.idea/shelf/
+.idea/libraries/
+*.iml
+*.log
+*.tmp
