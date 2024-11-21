@@ -19,6 +19,8 @@ repositories {
 }
 
 dependencies {
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+
     implementation libs.guava
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
@@ -26,11 +28,11 @@ dependencies {
     testImplementation libs.groovy
     testImplementation libs.spock.core
     testImplementation libs.junit
-    testImplementation 'org.apache.groovy:groovy:4.0.13'
+    testImplementation 'org.codehaus.groovy:groovy:3.0.19'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
-    testImplementation 'org.spockframework:spock-core:2.4-M4-groovy-4.0'
-    testImplementation 'org.spockframework:spock-spring:2.4-M4-groovy-4.0'
+    testImplementation 'org.spockframework:spock-core:2.1-groovy-3.0'
+    testImplementation 'org.spockframework:spock-spring:2.1-groovy-3.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
