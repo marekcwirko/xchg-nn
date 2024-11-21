@@ -1,69 +1,63 @@
 package org.example.web
 
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.http.MediaType
-import org.springframework.test.web.reactive.server.WebTestClient
+import org.example.model.Account
+import org.example.service.AccountService
+import org.example.service.ExchangeService
+import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
+import spock.lang.Unroll
 
-@WebFluxTest(AccountController)
+@SpringBootTest
 class AccountControllerSpec extends Specification {
 
-    WebTestClient webTestClient
+    def accountService = Mock(AccountService)
+    def exchangeService = Mock(ExchangeService)
+    def accountController = new AccountController(accountService, exchangeService)
 
-    def setup() {
-        webTestClient = WebTestClient
-                .bindToController(new AccountController())
-                .build()
-    }
-
-    def "should create an account and return the created account"() {
+    @Unroll
+    def "should create account with name: #name, surname: #surname, balancePLN: #balancePLN"() {
         given:
-        def account = "OK, create in accountService"
+        def expectedAccount = new Account(name: name, surname: surname, balancePLN: balancePLN, accountIdentifier: "test-id")
 
         when:
-        def response = webTestClient.post()
-                .uri { uriBuilder ->
-                    uriBuilder.path("/api/accounts")
-                            .queryParam("firstName", "John")
-                            .queryParam("lastName", "Doe")
-                            .queryParam("initialBalance", 1000.0)
-                            .build()
-                }
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
+        def result = accountController.createAccount(name, surname, balancePLN)
 
         then:
-        response.expectStatus().isOk()
-        response.expectBody().jsonPath('$').isEqualTo(account)
+        1 * accountService.createAccount(name, surname, balancePLN) >> expectedAccount
+        result.body == expectedAccount
+
+        where:
+        name | surname | balancePLN
+        "John" | "Doe" | 1000.0
     }
 
-    def "should fetch an account by id"() {
+    def "should get account by accountIdentifier"() {
         given:
-        def account = "OK, call accountService"
+        def accountIdentifier = "test-id"
+        def expectedAccount = new Account(accountIdentifier: accountIdentifier, balancePLN: 1000.0)
 
         when:
-        def response = webTestClient.get()
-                .uri("/api/accounts/1")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
+        def result = accountController.getAccount(accountIdentifier)
 
         then:
-        response.expectStatus().isOk()
-        response.expectBody().jsonPath('$').isEqualTo(account)
+        1 * accountService.getAccount(accountIdentifier) >> expectedAccount
+        result.body == expectedAccount
     }
 
-    def "should fetch the balance in USD for an account"() {
+    def "should exchange currency"() {
         given:
-        def usdBalance = 0.0
+        def accountIdentifier = "test-id"
+        def amount = 100.0
+        def isPlnToUsd = true
+        def exchangeRate = 3.0
+        def expectedAccount = new Account(accountIdentifier: accountIdentifier, balancePLN: 600.0)
 
         when:
-        def response = webTestClient.get()
-                .uri("/api/accounts/1/balance-usd")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
+        def result = accountController.exchangeCurrency(accountIdentifier, amount, isPlnToUsd)
 
         then:
-        response.expectStatus().isOk()
-        response.expectBody().jsonPath('$').isEqualTo(usdBalance)
+        1 * exchangeService.getExchangeRatePLNtoUSD() >> exchangeRate
+        1 * accountService.exchangeCurrency(accountIdentifier, amount, isPlnToUsd, exchangeRate) >> expectedAccount
+        result == expectedAccount
     }
 }
