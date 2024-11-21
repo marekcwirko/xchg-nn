@@ -19,21 +19,18 @@ repositories {
 }
 
 dependencies {
-    // Use the latest Groovy version for Spock testing
-    testImplementation libs.groovy
-
-    // Use the awesome Spock testing and specification framework even with Java
-    testImplementation libs.spock.core
-    testImplementation libs.junit
+    implementation libs.guava
+    implementation 'org.springframework.boot:spring-boot-starter-web'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-    // This dependency is used by the application.
-    implementation libs.guava
-
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation libs.groovy
+    testImplementation libs.spock.core
+    testImplementation libs.junit
+    testImplementation 'org.apache.groovy:groovy:4.0.13'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webflux'
+    testImplementation 'org.spockframework:spock-core:2.4-M4-groovy-4.0'
+    testImplementation 'org.spockframework:spock-spring:2.4-M4-groovy-4.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
