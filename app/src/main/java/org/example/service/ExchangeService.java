@@ -9,21 +9,26 @@ import java.util.Optional;
 @Service
 public class ExchangeService {
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
-    public Double getExchangeRatePLNtoUSD() {
+    public ExchangeService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public Optional<Double> getExchangeRatePLNtoUSD() {
         String NBP_EXCHANGERATES_URL = "http://api.nbp.pl/api/exchangerates/rates/A/USD/";
         var response = restTemplate.getForObject(NBP_EXCHANGERATES_URL, NBPResponse.class);
-        return Optional.of(response)
-                .map(r -> r.getRates().get(0).getMid())
-                .orElseThrow(ExchangeServiceNotAvailableException::new);
+        return Optional.ofNullable(response)
+                .flatMap(r -> r.getRates().stream().findFirst().map(NBPResponse.Rate::getMid));
     }
 
-    public Double convertPLNtoUSD(Double amountPLN) {
-        return amountPLN / getExchangeRatePLNtoUSD();
+    public Optional<Double> convertPLNtoUSD(Double amountPLN) {
+        return getExchangeRatePLNtoUSD()
+                .map(exchangeRate -> amountPLN / exchangeRate);
     }
 
-    public Double convertUSDtoPLN(Double amountUSD) {
-        return amountUSD * getExchangeRatePLNtoUSD();
+    public Optional<Double> convertUSDtoPLN(Double amountUSD) {
+        return getExchangeRatePLNtoUSD()
+                .map(exchangeRate -> amountUSD * exchangeRate);
     }
 }

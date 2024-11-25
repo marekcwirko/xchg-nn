@@ -5,7 +5,6 @@ import org.example.model.Account;
 import org.example.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,9 +29,10 @@ public class AccountService {
     }
 
     public Double getBalanceInUSD(String accountIdentifier) {
-        return Optional.of(accountRepository.findByAccountIdentifierOrThrow(accountIdentifier))
-                .map(account -> account.getBalancePLN() / exchangeService.getExchangeRatePLNtoUSD())
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+        Account account = accountRepository.findByAccountIdentifierOrThrow(accountIdentifier);
+        return exchangeService.getExchangeRatePLNtoUSD()
+                .map(exchangeRate -> account.getBalancePLN() / exchangeRate)
+                .orElseThrow(ExchangeRateUnavailableException::new);
     }
 
     public Account exchangeCurrency(String accountIdentifier, Double amount, boolean isPlnToUsd, Double exchangeRate) {
