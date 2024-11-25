@@ -2,7 +2,7 @@ package org.example.web;
 
 import jakarta.validation.Valid;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.NonNull;
 import org.example.model.Account;
 import org.example.service.AccountService;
 import org.example.service.ExchangeRateUnavailableException;
@@ -15,15 +15,20 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/accounts")
-@RequiredArgsConstructor
 @NoArgsConstructor(force = true)
 public class AccountController {
 
     private final AccountService accountService;
     private final ExchangeService exchangeService;
 
+    public AccountController(AccountService accountService, ExchangeService exchangeService) {
+        this.accountService = accountService;
+        this.exchangeService = exchangeService;
+    }
+
     @PostMapping
     public ResponseEntity<Account> createAccount(@Valid @RequestBody CreateAccountRequest request) {
+        RequestValidator.validateAccountCreateRequest(request);
         Account createdAccount = accountService.createAccount(
                 request.getName(),
                 request.getSurname(),

@@ -21,14 +21,4 @@ public class ExchangeService {
         return Optional.ofNullable(response)
                 .flatMap(r -> r.getRates().stream().findFirst().map(NBPResponse.Rate::getMid));
     }
-
-    public Optional<Double> convertPLNtoUSD(Double amountPLN) {
-        return getExchangeRatePLNtoUSD()
-                .map(exchangeRate -> amountPLN / exchangeRate);
-    }
-
-    public Optional<Double> convertUSDtoPLN(Double amountUSD) {
-        return getExchangeRatePLNtoUSD()
-                .map(exchangeRate -> amountUSD * exchangeRate);
-    }
 }
