@@ -28,7 +28,6 @@ class HealthEndpointSpec extends Specification {
         response.statusCode() == 200 // HttpStatus.OK.value()
 
         and: "The response contains health status as UP"
-        println response.body().asString()
         response.jsonPath().getString("status") == "UP"
 
         and: "The response contains custom health indicator details"
